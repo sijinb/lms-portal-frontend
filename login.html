@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login - CodeSphere</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-[#E6F2FF] flex items-center justify-center font-sans">
+
+<div class="bg-white p-8 w-96 rounded-2xl shadow-xl">
+
+<h2 class="text-3xl font-bold text-center mb-6 text-gray-800">
+CodeSphere Login
+</h2>
+
+<form onsubmit="redirectUser(event)">
+
+<div class="mb-4">
+<label class="text-sm text-gray-600">Select Role</label>
+<select id="role"
+class="w-full mt-1 border p-2 rounded-lg focus:ring-2 focus:ring-blue-500">
+<option value="student">Student</option>
+<option value="teacher">Teacher</option>
+<option value="admin">Admin</option>
+</select>
+</div>
+
+<div class="mb-4">
+<label class="text-sm text-gray-600">College ID</label>
+<input type="text"
+class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-blue-500">
+</div>
+
+<div class="mb-6">
+<label class="text-sm text-gray-600">Password</label>
+<input type="password"
+class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-blue-500">
+</div>
+
+<button type="submit"
+class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition duration-300">
+Sign In
+</button>
+
+</form>
+
+</div>
+
+<script>
+function redirectUser(e){
+  e.preventDefault();
+
+  const role = document.getElementById("role").value;
+
+  if(role === "student"){
+    window.location.href = "student.html";
+  }
+  else if(role === "teacher"){
+    window.location.href = "teacher.html";
+  }
+  else{
+    window.location.href = "admin.html";
+  }
+}
+</script>
+
+</body>
+</html>

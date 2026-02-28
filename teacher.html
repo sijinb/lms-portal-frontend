@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Teacher Dashboard - CodeSphere</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F3F4F6] font-sans">
+
+<header class="bg-gradient-to-b from-[#3F4A63] via-[#4C556F] to-[#7A7F8F] text-white py-8 shadow-md">
+
+  <div class="max-w-6xl mx-auto px-6 flex justify-between items-center">
+
+
+    <div>
+      <h1 class="text-3xl font-bold tracking-wide">
+        CodeSphere
+      </h1>
+      <p class="text-2xl text-gray-200">
+        Teacher Dashboard
+      </p>
+    </div>
+
+    <div class="flex items-center gap-6">
+
+      <span class="text-2xl text-gray-200">
+        Welcome, Teacher
+      </span>
+
+      <button class="bg-[#E76F51] hover:bg-[#d65f45] px-5 py-2 rounded-md transition">
+        Logout
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<div class="max-w-6xl mx-auto py-10 px-6">
+
+  <!-- Dashboard Metrics -->
+  <div class="grid grid-cols-3 gap-6 mb-10">
+
+    <div class="bg-white p-6 rounded-lg shadow text-center">
+      <h3 class="text-gray-500 mb-2">Active Students</h3>
+      <p id="activeStudents" class="text-3xl font-bold text-[#E76F51]">0</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow text-center">
+      <h3 class="text-gray-500 mb-2">Average Score</h3>
+      <p id="averageScore" class="text-3xl font-bold text-[#E76F51]">0%</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow text-center">
+      <h3 class="text-gray-500 mb-2">Programs Evaluated</h3>
+      <p id="programsEvaluated" class="text-3xl font-bold text-[#E76F51]">0</p>
+    </div>
+
+  </div>
+
+  <!-- Student Table -->
+  <div class="bg-white p-6 rounded-lg shadow mb-10">
+
+    <h2 class="text-2xl font-semibold text-[#2C3E50] mb-6">
+      Student Performance
+    </h2>
+
+    <table class="w-full text-left">
+      <thead>
+        <tr class="border-b">
+          <th class="py-3">Name</th>
+          <th>College ID</th>
+          <th>Program Score</th>
+          <th>Manual Mark</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="studentTable">
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- Exam Controls -->
+  <div class="bg-white p-6 rounded-lg shadow">
+
+    <h2 class="text-xl font-semibold mb-4 text-[#2C3E50]">
+      Exam Controls
+    </h2>
+
+    <button onclick="toggleExamMode()"
+      class="bg-[#3F4A63] hover:bg-[#4C556F] text-white px-6 py-2 rounded-md transition">
+      Toggle Exam Mode
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+async function loadDashboard() {
+  try {
+    const response = await fetch("/api/teacher-dashboard");
+    const data = await response.json();
+
+    // Update Metrics
+    document.getElementById("activeStudents").innerText = data.activeStudents;
+    document.getElementById("averageScore").innerText = data.averageScore + "%";
+    document.getElementById("programsEvaluated").innerText = data.programsEvaluated;
+
+    // Update Student Table
+    const table = document.getElementById("studentTable");
+    table.innerHTML = "";
+
+    data.students.forEach(student => {
+      table.innerHTML += `
+        <tr class="border-b">
+          <td class="py-3">${student.name}</td>
+          <td>${student.collegeId}</td>
+          <td>${student.programScore || 0}%</td>
+          <td>
+            <input type="number"
+              id="mark-${student.id}"
+              class="border rounded px-2 py-1 w-20">
+          </td>
+          <td>
+            <button onclick="submitMark('${student.id}')"
+              class="bg-[#E76F51] text-white px-3 py-1 rounded">
+              Save
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+  } catch (error) {
+    console.error("Error loading dashboard:", error);
+  }
+}
+
+async function submitMark(studentId) {
+
+  const mark = document.getElementById(`mark-${studentId}`).value;
+
+  await fetch("/api/update-mark", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      studentId: studentId,
+      manualMark: mark
+    })
+  });
+
+  alert("Mark updated successfully");
+}
+
+async function toggleExamMode() {
+  await fetch("/api/exam-mode", {
+    method: "POST"
+  });
+
+  alert("Exam mode toggled");
+}
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CodeSphere</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="relative min-h-screen overflow-hidden text-white">
+
+<!-- Gradient Background -->
+<div class="absolute inset-0 bg-gradient-to-br from-[#0F3D4C] via-[#0C5467] to-[#0E6E7F]"></div>
+
+<!-- Canvas Tech Animation -->
+<canvas id="matrix" class="absolute inset-0 opacity-20"></canvas>
+
+<!-- Hero Content -->
+<div class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6">
+
+  <h1 class="text-7xl md:text-8xl font-extrabold mb-6 tracking-tight">
+    CodeSphere
+  </h1>
+
+  <h2 class="text-5xl md:text-6xl font-bold mb-6">
+    Great Code. Real Intelligence.
+  </h2>
+
+  <p class="text-xl md:text-2xl text-[#CFEFF7] max-w-3xl mb-10">
+    A powerful ecosystem for students, teachers, and administrators.
+  </p>
+
+<div class="flex gap-6">
+
+    <button onclick="location.href='login.html'"
+      class="bg-[#22D3EE] hover:bg-cyan-400 text-black px-10 py-4 rounded-xl font-semibold transition duration-300 hover:scale-105 shadow-lg">
+      Get Started
+    </button>
+
+    <button
+      class="border border-[#22D3EE] px-10 py-4 rounded-xl font-semibold hover:bg-[#22D3EE]/20 transition">
+      Learn More
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const letters = "01{}[]()<>/\\=+-*functionvarconstlet";
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+
+const drops = [];
+for(let x = 0; x < columns; x++){
+  drops[x] = 1;
+}
+
+function draw(){
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#22D3EE";
+  ctx.font = fontSize + "px monospace";
+
+  for(let i = 0; i < drops.length; i++){
+    const text = letters[Math.floor(Math.random() * letters.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975){
+      drops[i] = 0;
+    }
+
+    drops[i]++;
+  }
+}
+
+setInterval(draw, 35);
+
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>

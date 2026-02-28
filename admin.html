@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin - CodeSphere</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#FDF6EC] min-h-screen p-8 font-sans">
+
+
+<header class="bg-gradient-to-b from-[#3F4A63] via-[#4C556F] to-[#7A7F8F] text-white py-6 shadow-md mb-10">
+
+  <div class="max-w-6xl mx-auto px-6 flex justify-between items-center">
+
+  
+    <div>
+      <h1 class="text-3xl font-bold tracking-wide">
+        CodeSphere
+      </h1>
+      <p class="text-xl text-gray-200">
+        Admin Control
+      </p>
+    </div>
+
+    <div class="flex items-center gap-6">
+
+      <span class="text-2xl text-gray-200">
+        Welcome, Admin
+      </span>
+
+      <button onclick="logout()"
+        class="bg-[#E76F51] hover:bg-[#d65f45] px-5 py-2 rounded-md transition">
+        Logout
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+<!-- Overview Cards -->
+<div class="grid grid-cols-3 gap-6 mb-10">
+
+  <div class="bg-white p-6 rounded-2xl shadow">
+    <h3 class="text-gray-600">Total Students</h3>
+    <p id="studentCount" class="text-3xl font-bold text-[#8B5CF6]">0</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-2xl shadow">
+    <h3 class="text-gray-600">Total Teachers</h3>
+    <p id="teacherCount" class="text-3xl font-bold text-[#8B5CF6]">0</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-2xl shadow">
+    <h3 class="text-gray-600">Exam Mode</h3>
+    <p id="examStatus" class="text-3xl font-bold text-red-500">OFF</p>
+  </div>
+
+</div>
+
+<!-- Add User Form -->
+<div class="bg-white p-6 rounded-2xl shadow mb-10">
+
+  <h2 class="text-xl font-semibold mb-6">Add User</h2>
+
+  <div class="grid grid-cols-4 gap-4">
+
+    <input id="name" placeholder="Full Name"
+      class="border p-2 rounded-lg">
+
+    <input id="collegeId" placeholder="College ID"
+      class="border p-2 rounded-lg">
+
+    <input id="password" placeholder="Password"
+      class="border p-2 rounded-lg">
+
+    <select id="role"
+      class="border p-2 rounded-lg">
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+    </select>
+
+  </div>
+
+  <button onclick="addUser()"
+    class="mt-6 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-6 py-2 rounded-lg transition">
+    Add User
+  </button>
+
+</div>
+
+<!-- User Table -->
+<div class="bg-white p-6 rounded-2xl shadow mb-10">
+
+  <h2 class="text-xl font-semibold mb-6">User Management</h2>
+
+  <table class="w-full text-left">
+    <thead>
+      <tr class="border-b">
+        <th class="py-3">Name</th>
+        <th>College ID</th>
+        <th>Role</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="userTable"></tbody>
+  </table>
+
+</div>
+
+<!-- Exam Controls -->
+<div class="bg-white p-6 rounded-2xl shadow">
+
+  <h2 class="text-xl font-semibold mb-4">System Controls</h2>
+
+  <button onclick="toggleExamMode()"
+    class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition">
+    Exam Mode
+  </button>
+
+</div>
+
+<script>
+
+let users = [];
+let examMode = false;
+
+function addUser(){
+
+  const name = document.getElementById("name").value.trim();
+  const id = document.getElementById("collegeId").value.trim();
+  const pass = document.getElementById("password").value.trim();
+  const role = document.getElementById("role").value;
+
+  if(!name || !id || !pass){
+    alert("All fields required");
+    return;
+  }
+
+  users.push({ name, id, role });
+
+  renderUsers();
+  updateCounts();
+
+  document.getElementById("name").value = "";
+  document.getElementById("collegeId").value = "";
+  document.getElementById("password").value = "";
+}
+
+function renderUsers(){
+
+  const table = document.getElementById("userTable");
+  table.innerHTML = "";
+
+  users.forEach((user, index) => {
+
+    table.innerHTML += `
+      <tr class="border-b">
+        <td class="py-3">${user.name}</td>
+        <td>${user.id}</td>
+        <td>${user.role}</td>
+        <td>
+          <button onclick="removeUser(${index})"
+            class="bg-red-500 text-white px-3 py-1 rounded-md">
+            Remove
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function removeUser(index){
+  users.splice(index,1);
+  renderUsers();
+  updateCounts();
+}
+
+function updateCounts(){
+  const studentCount = users.filter(u => u.role === "student").length;
+  const teacherCount = users.filter(u => u.role === "teacher").length;
+
+  document.getElementById("studentCount").innerText = studentCount;
+  document.getElementById("teacherCount").innerText = teacherCount;
+}
+
+function toggleExamMode(){
+  examMode = !examMode;
+  document.getElementById("examStatus").innerText = examMode ? "ON" : "OFF";
+  document.getElementById("examStatus").className =
+    examMode ? "text-3xl font-bold text-green-500"
+             : "text-3xl font-bold text-red-500";
+}
+
+function logout(){
+  window.location.href = "login.html";
+}
+
+</script>
+
+</body>
+</html>

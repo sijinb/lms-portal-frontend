@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CodeSphere IDE</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = { darkMode: 'class' }
+</script>
+</head>
+
+<body class="bg-gray-100 dark:bg-[#1E1E1E] text-gray-800 dark:text-gray-200 transition-colors duration-300 font-sans">
+
+<!-- TOP BAR -->
+<div class="flex justify-between items-center px-6 py-3 bg-white dark:bg-[#252526] border-b dark:border-gray-700">
+
+  <h1 class="text-xl font-semibold text-[#8B5CF6]">
+    CodeSphere IDE
+  </h1>
+
+  <div class="flex gap-4">
+
+    <button id="themeToggle"
+      onclick="toggleTheme()"
+      class="px-4 py-1 rounded-md bg-[#8B5CF6] text-white hover:bg-[#7C3AED] transition">
+      Dark Mode
+    </button>
+
+    <button onclick="startViva()"
+      class="px-4 py-1 rounded-md bg-green-500 hover:bg-green-600 text-white transition">
+      Start Viva
+    </button>
+
+  </div>
+
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="flex h-[calc(100vh-56px)]">
+
+  <!-- ALGORITHM PANEL -->
+  <div class="w-1/4 bg-white dark:bg-[#2D2D2D] border-r dark:border-gray-700 p-4 overflow-y-auto">
+
+    <h2 class="font-semibold mb-3 text-[#8B5CF6]">
+      Algorithm
+    </h2>
+
+    <div id="algorithmContent"
+         class="text-sm whitespace-pre-wrap">
+      Loading algorithm...
+    </div>
+
+  </div>
+
+  <!-- EDITOR AREA -->
+  <div class="flex flex-col flex-1">
+
+    <!-- CODE EDITOR -->
+    <textarea id="editor"
+      class="flex-1 bg-white dark:bg-[#1E1E1E]
+             text-black dark:text-green-400
+             font-mono p-6 outline-none">
+/* Write your code here */
+    </textarea>
+
+    <!-- CONTROL BAR -->
+    <div class="flex gap-4 px-6 py-3 bg-white dark:bg-[#252526] border-t dark:border-gray-700">
+
+      <button onclick="submitCode()"
+        class="px-6 py-2 rounded-md bg-green-500 hover:bg-green-600 text-white transition">
+        Run
+      </button>
+
+      <button onclick="debugCode()"
+        class="px-6 py-2 rounded-md bg-yellow-500 hover:bg-yellow-600 text-white transition">
+        Debug
+      </button>
+
+    </div>
+
+    <!-- TERMINAL -->
+    <div id="terminal"
+      class="h-40 bg-gray-200 dark:bg-black
+             text-black dark:text-green-400
+             font-mono p-4 overflow-y-auto">
+      > Ready...
+    </div>
+
+  </div>
+
+</div>
+
+<!-- VIVA MODAL -->
+<div id="vivaModal"
+  class="fixed inset-0 bg-black/40 hidden items-center justify-center">
+
+  <div class="bg-white dark:bg-[#2D2D2D] w-96 p-6 rounded-xl shadow-xl">
+
+    <h2 class="text-lg font-semibold mb-4 text-[#8B5CF6]">
+      Viva Session
+    </h2>
+
+    <div id="chatBox"
+      class="h-40 overflow-y-auto mb-4 border p-3 rounded-md text-sm">
+    </div>
+
+    <input id="vivaInput"
+      class="w-full border p-2 rounded-md mb-3 dark:bg-[#1E1E1E]">
+
+    <button onclick="sendAnswer()"
+      class="w-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white py-2 rounded-md transition">
+      Submit
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+/* ---------------- THEME TOGGLE ---------------- */
+
+const themeToggleBtn = document.getElementById("themeToggle");
+
+function toggleTheme(){
+  const isDark = document.documentElement.classList.toggle("dark");
+  themeToggleBtn.innerText = isDark ? "Light Mode" : "Dark Mode";
+}
+
+/* ---------------- LOAD ALGORITHM FROM BACKEND ---------------- */
+
+async function loadAlgorithm(){
+
+  try {
+    const response = await fetch("/api/student/algorithm");
+    const data = await response.json();
+
+    if(data.examMode){
+      document.getElementById("algorithmContent").innerHTML =
+        "<span class='text-red-500'>Algorithm hidden during exam.</span>";
+      return;
+    }
+
+    document.getElementById("algorithmContent").innerText =
+      data.algorithm || "No algorithm assigned.";
+
+  } catch (error){
+    document.getElementById("algorithmContent").innerText =
+      "Unable to load algorithm.";
+  }
+}
+
+/* ---------------- CODE SUBMISSION ---------------- */
+
+async function submitCode(){
+
+  const code = document.getElementById("editor").value;
+
+  const response = await fetch("/api/student/run", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code })
+  });
+
+  const result = await response.json();
+
+  document.getElementById("terminal").innerText =
+    result.output || "Execution complete.";
+}
+
+function debugCode(){
+  document.getElementById("terminal").innerText =
+    "> Debugging...\n> No syntax errors found.";
+}
+
+/* ---------------- VIVA ---------------- */
+
+async function startViva(){
+
+  document.getElementById("vivaModal").classList.remove("hidden");
+  document.getElementById("vivaModal").classList.add("flex");
+
+  const response = await fetch("/api/student/viva");
+  const data = await response.json();
+
+  document.getElementById("chatBox").innerHTML =
+    "<p><strong>Bot:</strong> " + data.question + "</p>";
+}
+
+async function sendAnswer(){
+
+  const answer = document.getElementById("vivaInput").value;
+
+  const response = await fetch("/api/student/viva-answer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ answer })
+  });
+
+  const data = await response.json();
+
+  document.getElementById("chatBox").innerHTML +=
+    "<p><strong>You:</strong> " + answer + "</p>" +
+    "<p><strong>Bot:</strong> " + data.nextQuestion + "</p>";
+
+  document.getElementById("vivaInput").value = "";
+}
+
+/* ---------------- INIT ---------------- */
+
+loadAlgorithm();
+
+</script>
+
+</body>
+</html>

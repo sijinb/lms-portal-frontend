@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login - CodeSphere</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#FDF6EC] flex items-center justify-center h-screen">
+
+<div class="bg-white p-8 w-96 rounded-xl shadow-lg">
+
+<h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+CodeSphere Login
+</h2>
+
+<form onsubmit="handleLogin(event)">
+
+<div class="mb-4">
+<label class="text-sm text-gray-600">Select Role</label>
+<select id="role" class="w-full mt-1 border p-2 rounded-md">
+<option value="student">Student</option>
+<option value="teacher">Teacher</option>
+<option value="admin">Admin</option>
+</select>
+</div>
+
+<div class="mb-4">
+<label class="text-sm text-gray-600">College ID</label>
+<input type="text" class="w-full border p-2 rounded-md">
+</div>
+
+<div class="mb-6">
+<label class="text-sm text-gray-600">Password</label>
+<input type="password" class="w-full border p-2 rounded-md">
+</div>
+
+<button id="loginBtn"
+class="relative w-full bg-green-400 text-white py-2 rounded-md overflow-hidden">
+Login
+</button>
+
+</form>
+
+</div>
+
+<script>
+// Ripple effect
+document.getElementById("loginBtn").addEventListener("click", function(e){
+  const circle = document.createElement("span");
+  circle.classList.add("absolute","bg-white","opacity-30","rounded-full");
+  circle.style.width = circle.style.height = "200px";
+  circle.style.left = e.offsetX - 100 + "px";
+  circle.style.top = e.offsetY - 100 + "px";
+  circle.style.animation = "ripple 0.6s linear";
+  this.appendChild(circle);
+  setTimeout(()=>circle.remove(),600);
+});
+
+function handleLogin(e){
+  e.preventDefault();
+  const role = document.getElementById("role").value;
+  window.location.href = role + ".html";
+}
+</script>
+
+<style>
+@keyframes ripple{
+  from{transform:scale(0);opacity:0.6;}
+  to{transform:scale(2);opacity:0;}
+}
+</style>
+
+</body>
+</html>
